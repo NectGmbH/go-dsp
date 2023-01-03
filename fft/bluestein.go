@@ -20,8 +20,7 @@ import (
 	"math"
 	"sync"
 
-	"github.com/mjibson/go-dsp/dsputils"
-)
+	"github.com/NectGmbH/go-dsp/dsputils"
 
 var (
 	bluesteinLock       sync.RWMutex

@@ -19,7 +19,7 @@ package spectral
 import (
 	"testing"
 
-	"github.com/mjibson/go-dsp/dsputils"
+	"github.com/NectGmbH/go-dsp/dsputils"
 )
 
 type segmentTest struct {
