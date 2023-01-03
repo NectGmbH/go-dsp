@@ -18,49 +18,45 @@ package fft
 
 import (
 	"math"
-	"sync"
 
 	"github.com/NectGmbH/go-dsp/dsputils"
 
-var (
-	bluesteinLock       sync.RWMutex
-	bluesteinFactors    = map[int][]complex128{}
-	bluesteinInvFactors = map[int][]complex128{}
+	"github.com/Code-Hex/go-generics-cache/policy/lfu"
 )
 
-func getBluesteinFactors(input_len int) ([]complex128, []complex128) {
-	bluesteinLock.RLock()
-
-	if hasBluesteinFactors(input_len) {
-		defer bluesteinLock.RUnlock()
-		return bluesteinFactors[input_len], bluesteinInvFactors[input_len]
-	}
-
-	bluesteinLock.RUnlock()
-	bluesteinLock.Lock()
-	defer bluesteinLock.Unlock()
-
-	if !hasBluesteinFactors(input_len) {
-		bluesteinFactors[input_len] = make([]complex128, input_len)
-		bluesteinInvFactors[input_len] = make([]complex128, input_len)
-
-		var sin, cos float64
-		for i := 0; i < input_len; i++ {
-			if i == 0 {
-				sin, cos = 0, 1
-			} else {
-				sin, cos = math.Sincos(math.Pi / float64(input_len) * float64(i*i))
-			}
-			bluesteinFactors[input_len][i] = complex(cos, sin)
-			bluesteinInvFactors[input_len][i] = complex(cos, -sin)
-		}
-	}
-
-	return bluesteinFactors[input_len], bluesteinInvFactors[input_len]
+type factors struct {
+	normal  []complex128
+	inverse []complex128
 }
 
-func hasBluesteinFactors(idx int) bool {
-	return bluesteinFactors[idx] != nil
+var bluesteinFactorCache = lfu.NewCache[int, factors](lfu.WithCapacity(64))
+
+func getBluesteinFactors(input_len int) ([]complex128, []complex128) {
+	factor, exists := bluesteinFactorCache.Get(input_len)
+	if exists {
+		return factor.normal, factor.inverse
+	}
+
+	normal := make([]complex128, input_len)
+	inverse := make([]complex128, input_len)
+
+	var sin, cos float64
+	for i := 0; i < input_len; i++ {
+		if i == 0 {
+			sin, cos = 0, 1
+		} else {
+			sin, cos = math.Sincos(math.Pi / float64(input_len) * float64(i*i))
+		}
+		normal[i] = complex(cos, sin)
+		inverse[i] = complex(cos, -sin)
+	}
+
+	bluesteinFactorCache.Set(input_len, factors{
+		normal:  normal,
+		inverse: inverse,
+	})
+
+	return normal, inverse
 }
 
 // bluesteinFFT returns the FFT calculated using the Bluestein algorithm.
