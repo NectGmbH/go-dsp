@@ -18,7 +18,7 @@
 package fft
 
 import (
-	"github.com/mjibson/go-dsp/dsputils"
+	"github.com/NectGmbH/go-dsp/dsputils"
 )
 
 // FFTReal returns the forward FFT of the real-valued slice.
@@ -86,9 +86,7 @@ func FFT(x []complex128) []complex128 {
 	return bluesteinFFT(x)
 }
 
-var (
-	worker_pool_size = 0
-)
+var worker_pool_size = 0
 
 // SetWorkerPoolSize sets the number of workers during FFT computation on multicore systems.
 // If n is 0 (the default), then GOMAXPROCS workers will be created.
@@ -192,7 +190,8 @@ func computeFFTN(m *dsputils.Matrix, fftFunc func([]complex128) []complex128) *d
 }
 
 // decrDim decrements an element of x by 1, skipping all -1s, and wrapping up to d.
-// If a value is 0, it will be reset to its correspending value in d, and will carry one from the next non -1 value to the right.
+// If a value is 0, it will be reset to its correspending value in d, and will carry one from the
+// next non -1 value to the right.
 // Returns true if decremented, else false.
 func decrDim(x, d []int) bool {
 	for n, v := range x {

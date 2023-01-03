@@ -23,7 +23,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/mjibson/go-dsp/dsputils"
+	"github.com/NectGmbH/go-dsp/dsputils"
 )
 
 const (
@@ -59,7 +59,8 @@ var fftTests = []fftTest{
 			complex(1, 0),
 			complex(1, 0),
 			complex(1, 0),
-			complex(1, 0)},
+			complex(1, 0),
+		},
 	},
 
 	// shifted impulse response
@@ -81,7 +82,8 @@ var fftTests = []fftTest{
 			complex(-1, 0),
 			complex(-sqrt2_2, sqrt2_2),
 			complex(0, 1),
-			complex(sqrt2_2, sqrt2_2)},
+			complex(sqrt2_2, sqrt2_2),
+		},
 	},
 
 	// other
@@ -91,7 +93,8 @@ var fftTests = []fftTest{
 			complex(10, 0),
 			complex(-2, 2),
 			complex(-2, 0),
-			complex(-2, -2)},
+			complex(-2, -2),
+		},
 	},
 	{
 		[]float64{1, 3, 5, 7},
@@ -99,7 +102,8 @@ var fftTests = []fftTest{
 			complex(16, 0),
 			complex(-4, 4),
 			complex(-4, 0),
-			complex(-4, -4)},
+			complex(-4, -4),
+		},
 	},
 	{
 		[]float64{1, 2, 3, 4, 5, 6, 7, 8},
@@ -111,7 +115,8 @@ var fftTests = []fftTest{
 			complex(-4, 0),
 			complex(-4, -1.65685425),
 			complex(-4, -4),
-			complex(-4, -9.65685425)},
+			complex(-4, -9.65685425),
+		},
 	},
 
 	// non power of 2 lengths
@@ -122,21 +127,24 @@ var fftTests = []fftTest{
 			complex(1, 0),
 			complex(1, 0),
 			complex(1, 0),
-			complex(1, 0)},
+			complex(1, 0),
+		},
 	},
 	{
 		[]float64{1, 2, 3},
 		[]complex128{
 			complex(6, 0),
 			complex(-1.5, 0.8660254),
-			complex(-1.5, -0.8660254)},
+			complex(-1.5, -0.8660254),
+		},
 	},
 	{
 		[]float64{1, 1, 1},
 		[]complex128{
 			complex(3, 0),
 			complex(0, 0),
-			complex(0, 0)},
+			complex(0, 0),
+		},
 	},
 }
 
@@ -150,14 +158,34 @@ var fft2Tests = []fft2Test{
 		[][]float64{{1, 2, 3}, {3, 4, 5}},
 		[][]complex128{
 			{complex(18, 0), complex(-3, 1.73205081), complex(-3, -1.73205081)},
-			{complex(-6, 0), complex(0, 0), complex(0, 0)}},
+			{complex(-6, 0), complex(0, 0), complex(0, 0)},
+		},
 	},
 	{
 		[][]float64{{0.1, 0.2, 0.3, 0.4, 0.5}, {1, 2, 3, 4, 5}, {3, 2, 1, 0, -1}},
 		[][]complex128{
-			{complex(21.5, 0), complex(-0.25, 0.34409548), complex(-0.25, 0.08122992), complex(-0.25, -0.08122992), complex(-0.25, -0.34409548)},
-			{complex(-8.5, -8.66025404), complex(5.70990854, 4.6742225), complex(1.15694356, 4.41135694), complex(-1.65694356, 4.24889709), complex(-6.20990854, 3.98603154)},
-			{complex(-8.5, 8.66025404), complex(-6.20990854, -3.98603154), complex(-1.65694356, -4.24889709), complex(1.15694356, -4.41135694), complex(5.70990854, -4.6742225)}},
+			{
+				complex(21.5, 0),
+				complex(-0.25, 0.34409548),
+				complex(-0.25, 0.08122992),
+				complex(-0.25, -0.08122992),
+				complex(-0.25, -0.34409548),
+			},
+			{
+				complex(-8.5, -8.66025404),
+				complex(5.70990854, 4.6742225),
+				complex(1.15694356, 4.41135694),
+				complex(-1.65694356, 4.24889709),
+				complex(-6.20990854, 3.98603154),
+			},
+			{
+				complex(-8.5, 8.66025404),
+				complex(-6.20990854, -3.98603154),
+				complex(-1.65694356, -4.24889709),
+				complex(1.15694356, -4.41135694),
+				complex(5.70990854, -4.6742225),
+			},
+		},
 	},
 }
 
@@ -176,7 +204,8 @@ var fftnTests = []fftnTest{
 			complex(-42, 0), complex(-10.5, 6.06217783), complex(-10.5, -6.06217783),
 
 			complex(-48, 0), complex(-4.5, -11.25833025), complex(-4.5, 11.25833025),
-			complex(22, 0), complex(8.5, -6.06217783), complex(8.5, 6.06217783)},
+			complex(22, 0), complex(8.5, -6.06217783), complex(8.5, 6.06217783),
+		},
 	},
 }
 
@@ -203,7 +232,14 @@ func TestFFT(t *testing.T) {
 
 		vi := IFFT(ft.out)
 		if !dsputils.PrettyCloseC(vi, dsputils.ToComplex(ft.in)) {
-			t.Error("IFFT error\ninput:", ft.out, "\noutput:", vi, "\nexpected:", dsputils.ToComplex(ft.in))
+			t.Error(
+				"IFFT error\ninput:",
+				ft.out,
+				"\noutput:",
+				vi,
+				"\nexpected:",
+				dsputils.ToComplex(ft.in),
+			)
 		}
 	}
 }
@@ -217,7 +253,14 @@ func TestFFT2(t *testing.T) {
 
 		vi := IFFT2(ft.out)
 		if !dsputils.PrettyClose2(vi, dsputils.ToComplex2(ft.in)) {
-			t.Error("IFFT2 error\ninput:", ft.out, "\noutput:", vi, "\nexpected:", dsputils.ToComplex2(ft.in))
+			t.Error(
+				"IFFT2 error\ninput:",
+				ft.out,
+				"\noutput:",
+				vi,
+				"\nexpected:",
+				dsputils.ToComplex2(ft.in),
+			)
 		}
 	}
 }
@@ -243,7 +286,16 @@ func TestReverseBits(t *testing.T) {
 		v := reverseBits(rt.in, rt.sz)
 
 		if v != rt.out {
-			t.Error("reverse bits error\ninput:", rt.in, "\nsize:", rt.sz, "\noutput:", v, "\nexpected:", rt.out)
+			t.Error(
+				"reverse bits error\ninput:",
+				rt.in,
+				"\nsize:",
+				rt.sz,
+				"\noutput:",
+				v,
+				"\nexpected:",
+				rt.out,
+			)
 		}
 	}
 }
@@ -279,7 +331,8 @@ func BenchmarkFFT(b *testing.B) {
 	}
 }
 
-// This example is adapted from Richard Lyon's "Understanding Digital Signal Processing," section 3.1.1.
+// This example is adapted from Richard Lyon's "Understanding Digital Signal Processing," section
+// 3.1.1.
 func ExampleFFTReal() {
 	numSamples := 8
 

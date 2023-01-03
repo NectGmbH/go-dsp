@@ -20,9 +20,9 @@ import (
 	"math"
 	"math/cmplx"
 
-	"github.com/mjibson/go-dsp/dsputils"
-	"github.com/mjibson/go-dsp/fft"
-	"github.com/mjibson/go-dsp/window"
+	"github.com/NectGmbH/go-dsp/dsputils"
+	"github.com/NectGmbH/go-dsp/fft"
+	"github.com/NectGmbH/go-dsp/window"
 )
 
 type PwelchOptions struct {
